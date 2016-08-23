@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>搜索引擎</title>
+	<script type="text/javascript">
+		function succCallBack(json){
+			console.log(json);
+		}
+	</script>
+	<style>
+		body{
+			background-image: url(bg.jpg);
+			background-repeat: no-repeat;
+			background-size: 100%;
+			color: #00B2EE;
+		}
+		#txt{
+			position: absolute;
+			top: 300px;
+			left:50%;
+			margin-left: -250px;
+			width: 500px;
+			height: 50px;
+			font-size: 30px;
+			background-color: #292929;
+			color: white;
+			border:1px solid #00B2EE;
+			box-shadow: 0 0 5px #00B2EE;
+		}
+		ul{
+			display:none;
+			border: 1px solid #141414;
+			width: 482px;
+			padding: 10px;
+			position: absolute;
+			top: 340px;left: 50%;
+			margin-left: -250px;
+			border-top: none;
+			background-color: #141414;
+			box-shadow: 0 0 10px #00B2EE;
+		}
+		li{list-style: none;
+			font-size: 20px;
+			width: 484px;
+			height: 40px;
+			line-height: 40px;
+		}
+		ul .active{
+			background-color: #00B2EE;
+			color: white;
+		}
+		img{
+			width: 200px;
+			position: absolute;
+			left: 50%;
+			margin-left: -100px;
+			top: 50px;
+		}
+	</style>
+</head>
+<body>
+	<img src="1.jpg" alt="">
+	<input type="text" id="txt">
+	<ul>
+		<li class="active"></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+	</ul>
+</body>
+
+<script type="text/javascript" src="ajax.js"></script>
+<script type="text/javascript" src="jquery-1.12.1.min.js"></script>
+<script type="text/javascript">
+	var txt = document.getElementById("txt");
+	var lis = document.querySelectorAll("li");
+	var ul = document.querySelector("ul");
+	var index = 0;
+
+	//键入内容
+	txt.onkeyup = function (e){
+		// if(e.keyCode == 37||e.keyCode == 38 ||e.keyCode == 39||e.keyCode == 40||e.keyCode == 13){
+		// 	return;
+		// }
+		// $("ul").slideDown(600);不能写这，键入时会一直弹动画
+		fnAjax({
+			url:"https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su",
+			data:{
+				wd:txt.value
+			},
+			jsonp:"cb",
+			dataType:"jsonp",
+			success:function (json){
+				console.log(json);
+				for(var i=0; i<lis.length; i++){
+					if (json.s.length ==0){
+						ul.style.display = "none";
+					}                  //不写这个if语句会在li中出现undefined的内容
+					if (json.s[i]){
+						lis[i].innerHTML = json.s[i];
+						ul.style.display = "block";
+						// $("ul").slideDown(600);不能这么写，键入时也会一直弹动画，难看
+					}
+				}
+			}
+		});
+	}
+
+	//键盘操作（回车选中内容、键盘上下选内容）
+	document.onkeydown = function (e){
+		switch(e.keyCode){
+			case 38://上
+				index--;
+				if (index < 0){
+					index = lis.length-1;
+				}
+				for (var i=0; i<lis.length; i++){
+					lis[i].className = "";
+				}
+				lis[index].className = "active";
+				break;
+
+			case 40://下
+				index++;
+				if (index>lis.length-1){
+					index = 0
+				}
+				for (var i=0; i<lis.length; i++){
+					lis[i].className = "";
+				}
+				lis[index].className = "active";
+				break;
+
+			case 13://回车
+				txt.value = lis[index].innerHTML;
+				$("ul").slideUp();
+				window.location.href="https://www.baidu.com/s?wd="+txt.value;
+		}
+	}
+
+	//鼠标操作（鼠标移动选择内容、点击选中内容）
+	for(var i=0; i<lis.length; i++){
+		lis[i].onmouseenter = function (){
+
+			for (var i=0; i<lis.length; i++){
+				lis[i].className = "";
+			}
+			this.className = "active";
+		}
+		lis[i].onclick = function (){
+			txt.value = this.innerHTML;
+			$("ul").slideUp();
+			window.location.href="https://www.baidu.com/s?wd="+txt.value;//连接百度搜索引擎
+		}
+	}
+
+	//点击页面，ul收起
+	document.onclick = function (){
+		$("ul").slideUp();
+	}
+</script>
+</html>
